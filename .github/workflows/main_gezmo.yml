@@ -52,5 +52,5 @@ jobs:
         with:
           app-name: 'Gezmo'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_FED027BB23D548288DBCA2E3DED1ACD3 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3FE433F28F114BB8B123D6A67A51F812 }}
           package: .
