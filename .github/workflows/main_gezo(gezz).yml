@@ -1,0 +1,51 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy container app to Azure Web App - gezo(gezz)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: 'ubuntu-latest'
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Log in to registry
+      uses: docker/login-action@v1
+      with:
+        registry: https://gezoacr.azurecr.io/
+        username: ${{ secrets.AzureAppService_ContainerUsername_3781b39812f145d79bf6f7ce0674d647 }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_8d060a14436944748ee18369989f3f0b }}
+
+    - name: Build and push container image to registry
+      uses: docker/build-push-action@v2
+      with:
+        push: true
+        tags: gezoacr.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_3781b39812f145d79bf6f7ce0674d647 }}/gezo2c4f:${{ github.sha }}
+        file: ./Dockerfile
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'gezz'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+    - name: Deploy to Azure Web App
+      id: deploy-to-webapp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'gezo'
+        slot-name: 'gezz'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_4e2a7f30dcb04faca782196e4f8b4b17 }}
+        images: 'gezoacr.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_3781b39812f145d79bf6f7ce0674d647 }}/gezo2c4f:${{ github.sha }}'
